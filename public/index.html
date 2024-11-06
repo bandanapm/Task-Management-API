@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <h1>Task Management</h1>
+
+    <div id="task-form">
+        <h2 id="form-title">Add Task</h2>
+        <input type="text" id="title" placeholder="Task Title" required>
+        <input type="text" id="description" placeholder="Task Description" required>
+        <button id="submit-button" onclick="addOrUpdateTask()">Add Task</button>
+    </div>
+
+    <h2>All Tasks</h2>
+    <ul id="task-list"></ul>
+
+    <script>
+        let editMode = false; // Track whether we're editing a task
+        let editingTaskId = null; // Track the task being edited
+
+        // Fetch and display tasks
+        async function fetchTasks() {
+            const response = await fetch('http://localhost:3000/tasks');
+            const tasks = await response.json();
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = ''; // Clear existing tasks
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+          <strong>${task.title}</strong><br>
+          ${task.description}<br>
+          <em>Completed: ${task.completed}</em><br>
+          <button onclick="editTask('${task.id}')">Edit</button>
+          <button id="complete-btn-${task.id}" onclick="toggleCompleteTask('${task.id}', ${task.completed})">
+            ${task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
+          </button>
+          <button onclick="deleteTask('${task.id}')">Delete</button>
+        `;
+                taskList.appendChild(li);
+            });
+        }
+
+        // Add or update a task
+        async function addOrUpdateTask() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            if (editMode) {
+                // If we're editing a task, send a PUT request to update it
+                await fetch(`http://localhost:3000/tasks/${editingTaskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+                resetForm(); // Reset the form after editing
+            } else {
+                // Otherwise, add a new task
+                const response = await fetch('http://localhost:3000/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description })
+                });
+
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    alert(errorData.error); // Show an alert with the error message
+                }
+            }
+
+            fetchTasks(); // Refresh task list
+        }
+
+        // Edit a task (populate form with task details)
+        function editTask(id) {
+            editMode = true;
+            editingTaskId = id;
+
+            const task = [...document.querySelectorAll('#task-list li')].find(li => li.innerHTML.includes(id));
+
+            // Get task details from UI (or fetch from the backend if needed)
+            const title = task.querySelector('strong').textContent;
+            const description = task.childNodes[2].textContent;
+
+            document.getElementById('title').value = title;
+            document.getElementById('description').value = description;
+
+            document.getElementById('form-title').textContent = 'Edit Task';
+            document.getElementById('submit-button').textContent = 'Update Task';
+        }
+
+        // Toggle task completion status
+        async function toggleCompleteTask(id, isCompleted) {
+            const newCompletedStatus = !isCompleted; // Toggle the completed status
+            await fetch(`http://localhost:3000/tasks/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: newCompletedStatus })
+            });
+
+            fetchTasks(); // Refresh the task list after toggling status
+        }
+
+        // Delete a task
+        async function deleteTask(id) {
+            await fetch(`http://localhost:3000/tasks/${id}`, {
+                method: 'DELETE'
+            });
+            fetchTasks(); // Refresh task list after deleting
+        }
+
+        // Reset form after editing
+        function resetForm() {
+            editMode = false;
+            editingTaskId = null;
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('form-title').textContent = 'Add Task';
+            document.getElementById('submit-button').textContent = 'Add Task';
+        }
+
+        fetchTasks();
+    </script>
+</body>
+
+</html>
