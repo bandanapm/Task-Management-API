@@ -27,7 +27,7 @@ pipeline {
                 sh 'nohup your_command &'
             } else {
                 echo 'bats'
-                bat 'start /B your_command'
+                powershell 'start /B your_command'
             }
         }
     }
