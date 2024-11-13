@@ -5,6 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "publishConfig": {
+    "registry": "http://localhost:8081/repository/todo-host/"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
