@@ -19,19 +19,7 @@ pipeline {
 
 
     stages {
-        stage('Run Background Process') {
-    steps {
-        script {
-            if (isUnix()) {
-                echo 'shs'
-                sh 'nohup your_command &'
-            } else {
-                echo 'bats'
-                powershell 'start /B your_command'
-            }
-        }
-    }
-}
+        
         stage('Checkout') {
             steps {
                 checkout scm
@@ -40,7 +28,8 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                bat 'npm install'
+                echo 'installing npm...'
+                sh 'npm install'
             }
         }
 
@@ -48,7 +37,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'npm-nexus-credentials', variable: 'mynpmrc')]) {
                     echo 'Building...'
-                    bat 'npm install --userconfig $mynpmrc --registry http://localhost:8081/repository/todo-host --loglevel verbose'
+                    sh 'npm install --userconfig $mynpmrc --registry http://localhost:8081/repository/todo-host --loglevel verbose'
                 }
             }
         }
@@ -57,7 +46,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube') {
-                        bat """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
+                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
                         -Dsonar.token=squ_79ad5d3f6a124046c489b678f687a3368c6c154f \
                         -Dsonar.projectName="Todo_API" \
                         -Dsonar.exclusions=**/node_modules/** \
@@ -88,11 +77,11 @@ pipeline {
         }
 
 
-        stage('Publibat to Nexus') {
+        stage('Publish to Nexus') {
             steps {
                 withCredentials([file(credentialsId: 'npm-nexus-credentials', variable: 'mynpmrc')]) {
-                    echo 'Publibating to Nexus...'
-                    bat 'npm publibat --userconfig $mynpmrc --loglevel verbose'
+                    echo 'Publishing to Nexus...'
+                    sh 'npm publish --userconfig $mynpmrc --loglevel verbose'
                 }
             }
         }
