@@ -27,7 +27,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'npm-nexus-credentials', variable: 'mynpmrc')]) {
                     echo 'Building...'
-                    sh 'npm install --userconfig $mynpmrc --registry http://localhost:8081/repository/todo-host --loglevel verbose'
+                    bat 'npm install --userconfig $mynpmrc --registry http://localhost:8081/repository/todo-host --loglevel verbose'
                 }
             }
         }
@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('SonarQube') {
-                        sh """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
+                        bat """${SCANNER_HOME}/bin/sonar-scanner -Dsonar.host.url=http://localhost:9000/ \
                         -Dsonar.token=squ_79ad5d3f6a124046c489b678f687a3368c6c154f \
                         -Dsonar.projectName="Todo_API" \
                         -Dsonar.exclusions=**/node_modules/** \
@@ -75,11 +75,11 @@ pipeline {
         }
 
 
-        stage('Publish to Nexus') {
+        stage('Publibat to Nexus') {
             steps {
                 withCredentials([file(credentialsId: 'npm-nexus-credentials', variable: 'mynpmrc')]) {
-                    echo 'Publishing to Nexus...'
-                    sh 'npm publish --userconfig $mynpmrc --loglevel verbose'
+                    echo 'Publibating to Nexus...'
+                    bat 'npm publibat --userconfig $mynpmrc --loglevel verbose'
                 }
             }
         }
