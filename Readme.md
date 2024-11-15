@@ -86,6 +86,10 @@ Setup Instructions
 Project Structure
 
 Copy code
+├── docker/ 
+|   ├── docker-compose.yml  
+├── Jenkins/ 
+|   ├── Jenkinfiles 
 ├── node_modules
 ├── index.js         # Main server file (API)  
 ├── public/ 
