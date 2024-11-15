@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+     "build": "webpack --config webpack.config.js",
+     "package": "rm -f publish/my-app.tgz && mkdir -p publish && cd dist && tar -czvf ../publish/my-app.tgz ."
   },
   "publishConfig": {
     "registry": "http://localhost:8081/repository/todo-host/"
@@ -15,5 +17,9 @@
   "dependencies": {
     "express": "^4.21.1",
     "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4"
   }
 }
