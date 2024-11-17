@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-     "build": "webpack --config webpack.config.js",
-     "package": "rm -f publish/my-app.tgz && mkdir -p publish && cd dist && tar -czvf ../publish/my-app.tgz ."
+    "build": "webpack --config webpack.config.js",
+    "package": "rm -f publish/my-app.tgz && mkdir -p publish && cd dist && tar -czvf ../publish/my-app.tgz ."
   },
   "publishConfig": {
     "registry": "http://localhost:8081/repository/todo-host/"
